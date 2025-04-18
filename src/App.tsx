@@ -1,49 +1,55 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useState, useEffect } from "react";
+import MDEditor from "@uiw/react-md-editor";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [value, setValue] = useState<string | undefined>("# Welcome to Yamed\n\nStart writing your markdown here...");
+  const [isFocused, setIsFocused] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle focus mode with Cmd/Ctrl + Shift + F
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'f') {
+        setIsFocused(prev => !prev);
+      }
+      // Show toolbar with Cmd/Ctrl + /
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        setShowToolbar(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <main className={`container ${isFocused ? 'focus-mode' : ''}`}>
+      <div className="editor-container">
+        <div className={`toolbar ${showToolbar ? 'visible' : ''}`}>
+          <button onClick={() => setShowToolbar(!showToolbar)}>☰</button>
+          <button onClick={() => setIsFocused(!isFocused)}>👁️</button>
+        </div>
+        <div data-color-mode="light" className="single-window-editor">
+          <MDEditor
+            value={value}
+            onChange={(val) => setValue(val)}
+            height="100vh"
+            preview="edit"
+            hideToolbar={!showToolbar}
+            enableScroll={true}
+            visibleDragbar={false}
+            highlightEnable={true}
+            textareaProps={{
+              placeholder: "Start writing your markdown here...",
+              className: "typora-style-editor",
+              onFocus: () => setIsFocused(true),
+              onBlur: () => setIsFocused(false)
+            }}
+          />
+        </div>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
     </main>
   );
 }

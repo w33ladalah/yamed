@@ -6,13 +6,13 @@
   filter: drop-shadow(0 0 2em #61dafb);
 }
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 1.6;
   font-weight: 400;
 
-  color: #0f0f0f;
-  background-color: #f6f6f6;
+  color: #333;
+  background-color: #fff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,11 +23,127 @@
 
 .container {
   margin: 0;
-  padding-top: 10vh;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-color: #fff;
+}
+
+.editor-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-color: #fff;
+}
+
+/* Single Window Editor */
+.single-window-editor {
+  width: 100%;
+  height: 100%;
+}
+
+.single-window-editor .w-md-editor {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: #fff !important;
+}
+
+.single-window-editor .w-md-editor-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  padding: 2rem !important;
+  color: #333 !important;
+  background-color: #fff !important;
+  width: 100% !important;
+}
+
+.single-window-editor .w-md-editor-preview {
+  display: none !important;
+}
+
+/* Typora-style Editor */
+.typora-style-editor {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  padding: 2rem !important;
+  color: #333 !important;
+  background-color: #fff !important;
+  border: none !important;
+  outline: none !important;
+  resize: none !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+  max-width: 800px !important;
+  margin: 0 auto !important;
+}
+
+.w-md-editor {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: #fff !important;
+}
+
+.w-md-editor-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  padding: 2rem !important;
+  color: #333 !important;
+  background-color: #fff !important;
+}
+
+.w-md-editor-preview {
+  padding: 2rem !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  color: #333 !important;
+  background-color: #fff !important;
+}
+
+/* Toolbar */
+.toolbar {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.toolbar.visible {
+  opacity: 1;
+}
+
+.toolbar button {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.toolbar button:hover {
+  color: #333;
+}
+
+/* Focus Mode */
+.focus-mode .w-md-editor-text {
+  filter: blur(3px);
+  transition: filter 0.3s ease;
+}
+
+.focus-mode .w-md-editor-text:focus-within {
+  filter: none;
 }
 
 .logo {
@@ -58,6 +174,8 @@ a:hover {
 
 h1 {
   text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
 }
 
 input,
@@ -95,22 +213,20 @@ button {
   margin-right: 5px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
+/* Markdown Editor Styles */
+.w-md-editor {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-  a:hover {
-    color: #24c8db;
-  }
+.w-md-editor-toolbar {
+  border-bottom: 1px solid #e0e0e0;
+}
 
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
+.w-md-editor-text {
+  font-family: 'Fira Code', monospace;
+}
+
+.w-md-editor-preview {
+  padding: 1rem;
 }
