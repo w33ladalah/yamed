@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import "./App.css";
@@ -7,6 +7,7 @@ function App() {
   const [value, setValue] = useState<string>("# Welcome to Yamed\n\nStart writing your markdown here...");
   const [isFocused, setIsFocused] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -26,7 +27,48 @@ function App() {
   }, []);
 
   const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    setValue(e.currentTarget.value);
+    const textarea = e.currentTarget;
+    const newValue = textarea.value;
+    setValue(newValue);
+
+    // Handle list creation
+    if (newValue.endsWith('\n')) {
+      const lines = newValue.split('\n');
+      const currentLine = lines[lines.length - 2]; // The line before the newline
+
+      // Check if we're in a list
+      if (currentLine.match(/^[-*+]\s/)) {
+        // Continue the list
+        const newLines = [...lines, '- '];
+        setValue(newLines.join('\n'));
+
+        // Set cursor position after the new list item
+        setTimeout(() => {
+          if (textareaRef.current) {
+            const newPosition = newLines.join('\n').length;
+            textareaRef.current.setSelectionRange(newPosition, newPosition);
+          }
+        }, 0);
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      const textarea = e.currentTarget;
+      const lines = value.split('\n');
+      const currentLine = lines[lines.length - 1];
+
+      // If we're in a list and the current line is empty, end the list
+      if (currentLine.match(/^[-*+]\s$/) || currentLine === '') {
+        const prevLine = lines[lines.length - 2];
+        if (prevLine && prevLine.match(/^[-*+]\s/)) {
+          e.preventDefault();
+          const newLines = [...lines.slice(0, -1), ''];
+          setValue(newLines.join('\n'));
+        }
+      }
+    }
   };
 
   return (
@@ -39,8 +81,10 @@ function App() {
         <div className="single-window-editor">
           <div className="editor-content">
             <textarea
+              ref={textareaRef}
               value={value}
               onChange={handleInput}
+              onKeyDown={handleKeyDown}
               className="typora-style-editor"
               placeholder="Start writing your markdown here..."
               onFocus={() => setIsFocused(true)}
